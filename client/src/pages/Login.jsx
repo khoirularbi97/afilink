@@ -20,8 +20,8 @@ export default function Login() {
   return (
     <div className="auth-page">
       <form className="auth-card" onSubmit={submit}>
-        <div className="brand big"><span className="brand-mark">A</span> AfiLink</div>
-        <p className="muted">Kelola link afiliasi dan pantau setiap klik.</p>
+        <img src="/logo.png" alt="AfiLink" className="auth-logo" />
+        <p className="muted auth-tagline">Kelola link afiliasi dan pantau setiap klik.</p>
         {err && <div className="alert error">{err}</div>}
         <label>Email
           <input type="email" required autoFocus value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />

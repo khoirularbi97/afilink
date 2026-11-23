@@ -1,12 +1,12 @@
 :root {
-  --bg: #f6f5f3;
+  --bg: #f6f7f9;
   --card: #ffffff;
-  --ink: #1c1b1a;
-  --ink-2: #57534e;
-  --muted: #8a847d;
-  --line: #ebe8e4;
-  --accent: #ee4d2d;
-  --accent-soft: #fdeee9;
+  --ink: #0f2544;
+  --ink-2: #475569;
+  --muted: #7b8494;
+  --line: #e6e8ec;
+  --accent: #f26539;
+  --accent-soft: #feefe8;
   --green: #15803d; --green-soft: #e7f6ec;
   --amber: #b45309; --amber-soft: #fdf3e2;
   --red: #b91c1c; --red-soft: #fdecec;
@@ -40,7 +40,11 @@ p { margin: 0; }
 }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; padding: 0 8px 22px; letter-spacing: -.01em; }
 .brand.big { font-size: 20px; padding: 0 0 6px; }
-.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 15px; }
+.brand-logo { height: 26px; width: auto; display: block; }
+.brand .afi { color: var(--ink); }
+.brand .link { color: var(--accent); }
+.auth-logo { width: 170px; height: auto; align-self: center; margin: 4px 0 2px; }
+.auth-tagline { text-align: center; }
 nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
 .nav-item {
   display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
@@ -170,7 +174,7 @@ label { display: flex; flex-direction: column; gap: 5px; font-weight: 500; font-
 .prefix-input input { border-radius: 0 8px 8px 0; }
 .actions { display: flex; justify-content: flex-end; gap: 8px; }
 
-.modal-bg { position: fixed; inset: 0; background: rgba(28, 27, 26, .4); display: grid; place-items: center; padding: 16px; z-index: 50; }
+.modal-bg { position: fixed; inset: 0; background: rgba(15, 37, 68, .45); display: grid; place-items: center; padding: 16px; z-index: 50; }
 .modal { background: var(--card); border-radius: 14px; padding: 20px; width: 100%; max-width: 520px; max-height: 90vh; overflow: auto; display: flex; flex-direction: column; gap: 12px; }
 .modal-head { display: flex; justify-content: space-between; align-items: center; }
 .modal-head h3 { margin: 0; font-size: 16px; }

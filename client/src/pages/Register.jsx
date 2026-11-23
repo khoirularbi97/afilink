@@ -33,8 +33,8 @@ export default function Register() {
   return (
     <div className="auth-page">
       <form className="auth-card" onSubmit={submit}>
-        <div className="brand big"><span className="brand-mark">A</span> AfiLink</div>
-        <p className="muted">Daftar sebagai afiliator.</p>
+        <img src="/logo.png" alt="AfiLink" className="auth-logo" />
+        <p className="muted auth-tagline">Daftar sebagai afiliator.</p>
         {err && <div className="alert error">{err}</div>}
         <label>Nama<input required minLength={2} value={form.name} onChange={set('name')} /></label>
         <label>Email<input type="email" required value={form.email} onChange={set('email')} /></label>

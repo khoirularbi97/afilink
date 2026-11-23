@@ -21,7 +21,7 @@ export default function Layout() {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div className="brand"><span className="brand-mark">A</span> AfiLink</div>
+        <div className="brand"><img src="/mark.png" alt="" className="brand-logo" /><span><span className="afi">Afi</span><span className="link">Link</span></span></div>
         <nav>
           {items.map((i) => (
             <NavLink key={i.to} to={i.to} end={i.end} className="nav-item">
