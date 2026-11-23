@@ -72,17 +72,25 @@ curl http://127.0.0.1:4005/api/health  # harus: {"ok":true}
 
 ### Routing domain ke port backend
 
-Port 80/443 di VPS dipegang **nginx-proxy (Docker)**. Daftarkan `api-afilink.scurebot.site` **dan** `s.scurebot.site`
-ke port backend (contoh 4005) **dengan cara yang sama seperti `api-simpuk` / `api-lembur`**, termasuk SSL dari acme-companion.
+Port 80/443 dipegang **nginx-proxy (Docker)** yang hanya bisa meneruskan ke container.
+File `deploy/pm2-bridge.compose.yml` membuat container `socat` kecil (±1 MB RAM) yang meneruskan
+`api-afilink.scurebot.site` dan `s.scurebot.site` ke port 4005 di host. SSL dibuat otomatis oleh acme-companion.
 
-Yang perlu dipastikan pada konfigurasi proxy-nya:
-- Header `X-Forwarded-For` diteruskan (nginx-proxy melakukannya secara default) — supaya IP & kota pengunjung terbaca.
-- Header `X-Forwarded-Proto` diteruskan — supaya cookie `secure` berfungsi.
-
-Uji:
 ```bash
-curl https://api-afilink.scurebot.site/api/health
+cd /var/www/afilink
+docker inspect nginx_proxy --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+# misal hasilnya: smart-parking_default
+
+PROXY_NETWORK=smart-parking_default docker compose -f deploy/pm2-bridge.compose.yml up -d
+
+sudo ufw allow from 172.16.0.0/12 to any port 4005 proto tcp   # kalau pakai UFW; port tidak dibuka ke publik
+
+# tunggu 1–2 menit sampai sertifikat terbit
+docker logs nginx_letsencrypt --tail 20
+curl https://api-afilink.scurebot.site/api/health   # {"ok":true}
 ```
+
+`502 Bad Gateway` = container belum bisa menjangkau port di host → cek aturan UFW di atas dan `pm2 status`.
 
 ### Tambah swap (kalau RAM mepet)
 ```bash

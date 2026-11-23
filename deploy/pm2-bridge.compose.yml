@@ -1,0 +1,25 @@
+# Jembatan nginx-proxy (Docker) -> backend PM2 di host.
+# nginx-proxy hanya bisa meneruskan ke container, jadi container socat kecil ini
+# meneruskan api-afilink.scurebot.site dan s.scurebot.site ke port backend di host.
+#
+# Jalankan:  PROXY_NETWORK=<network nginx-proxy> docker compose -f deploy/pm2-bridge.compose.yml up -d
+# Ganti 4005 di 3 tempat kalau PORT di server/.env berbeda.
+services:
+  afilink-bridge:
+    image: alpine/socat
+    container_name: afilink-bridge
+    restart: unless-stopped
+    command: tcp-listen:4005,fork,reuseaddr tcp:host.docker.internal:4005
+    expose: ["4005"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    mem_limit: 16m
+    environment:
+      VIRTUAL_HOST: api-afilink.scurebot.site,s.scurebot.site
+      VIRTUAL_PORT: "4005"
+      LETSENCRYPT_HOST: api-afilink.scurebot.site,s.scurebot.site
+    networks: [proxy]
+
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-nginx-proxy}
