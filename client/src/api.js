@@ -1,9 +1,12 @@
 // Base URL API. Kosong = origin yang sama (dev pakai proxy Vite, produksi pakai Nginx).
 const BASE = import.meta.env.VITE_API_URL || '';
 
-// Domain link pendek yang dibagikan ke pembeli, mis. https://scurebot.site
+// Domain link pendek yang dibagikan ke pembeli, mis. https://s.scurebot.site
 export const SHORT_BASE = (import.meta.env.VITE_SHORT_BASE || window.location.origin).replace(/\/$/, '');
-export const shortUrl = (slug) => `${SHORT_BASE}/go/${slug}`;
+// Awalan path. Di domain pendek khusus set VITE_SHORT_PREFIX=/ supaya link jadi
+// s.scurebot.site/slug. Default /go/ aman kalau link pendek berbagi domain dengan aplikasi.
+const SHORT_PREFIX = (import.meta.env.VITE_SHORT_PREFIX || '/go/').replace(/^\/?/, '/').replace(/\/?$/, '/');
+export const shortUrl = (slug) => `${SHORT_BASE}${SHORT_PREFIX}${slug}`;
 
 export class ApiError extends Error {
   constructor(message, status, fields) {

@@ -4,9 +4,11 @@ import { query } from '../db.js';
 import { cache } from '../lib/cache.js';
 import { parseVisitor } from '../lib/tracker.js';
 
-const r = Router();
 const VID = 'vid';
 const UUID_RE = /^[0-9a-f-]{36}$/i;
+
+// Path pertama yang bukan slug: biar /:slug di root tidak menyentuh database untuk ini.
+const SKIP = new Set(['favicon.ico', 'robots.txt', 'go', 'api', '']);
 
 async function findLink(slug) {
   let link = cache.get(slug);
@@ -43,9 +45,11 @@ async function logClick(linkId, visitorId, v) {
   );
 }
 
-r.get('/go/:slug', async (req, res, next) => {
+async function redirect(req, res, next) {
   try {
-    const slug = String(req.params.slug).toLowerCase();
+    const slug = String(req.params.slug || '').toLowerCase();
+    if (SKIP.has(slug)) return next();
+
     const link = await findLink(slug);
     if (!link || !link.is_active || link.owner_status !== 'active') {
       return res.status(404).type('html').send('<h3>Link tidak ditemukan atau sudah tidak aktif.</h3>');
@@ -56,7 +60,7 @@ r.get('/go/:slug', async (req, res, next) => {
     if (!visitorId || !UUID_RE.test(visitorId)) {
       visitorId = crypto.randomUUID();
       res.cookie(VID, visitorId, {
-        httpOnly: true, sameSite: 'lax', path: '/go',
+        httpOnly: true, sameSite: 'lax', path: '/',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 365 * 24 * 3600 * 1000,
       });
@@ -70,6 +74,15 @@ r.get('/go/:slug', async (req, res, next) => {
       .then((visitor) => logClick(link.id, visitorId, visitor))
       .catch((e) => console.error('[click] gagal dicatat:', e.message));
   } catch (e) { next(e); }
-});
+}
 
-export default r;
+// Bentuk panjang: /go/:slug — dipasang paling depan, tetap didukung untuk link lama.
+export const goRedirect = Router();
+goRedirect.get('/go/:slug', redirect);
+
+// Bentuk pendek: /:slug — dipasang paling akhir, untuk domain pendek khusus
+// (mis. s.scurebot.site/sepatu-murah). Di domain pendek, root hanya melayani redirect.
+export const rootRedirect = Router();
+rootRedirect.get('/:slug', redirect);
+
+export default goRedirect;

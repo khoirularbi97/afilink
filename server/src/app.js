@@ -3,7 +3,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-import redirect from './routes/redirect.js';
+import { goRedirect, rootRedirect } from './routes/redirect.js';
 import auth from './routes/auth.js';
 import links from './routes/links.js';
 import stats from './routes/stats.js';
@@ -19,8 +19,8 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json({ limit: '100kb' }));
 
-// Redirect ditaruh paling depan, tanpa CORS.
-app.use(redirect);
+// Redirect bentuk panjang (/go/:slug) ditaruh paling depan, tanpa CORS.
+app.use(goRedirect);
 
 app.use('/api', cors({
   origin: (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(','),
@@ -33,6 +33,10 @@ app.use('/api/stats', stats);
 app.use('/api/admin', admin);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Endpoint tidak ada' }));
+
+// Redirect bentuk pendek (/:slug) dipasang PALING AKHIR, sesudah /api & /go,
+// supaya hanya menangkap slug dan tidak pernah menelan rute lain.
+app.use(rootRedirect);
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {

@@ -6,11 +6,18 @@ Susunan yang dipakai:
 |---|---|---|
 | Database | Neon | — |
 | Backend (API + redirect) | VPS, PM2 | `https://api-afilink.scurebot.site` |
-| Link pendek (backend yang sama) | VPS, PM2 | `https://s.scurebot.site/go/<slug>` |
+| Link pendek (backend yang sama) | VPS, PM2 | `https://s.scurebot.site/<slug>` |
 | Frontend | Vercel | `https://afilink.scurebot.site` |
 
 > Frontend **wajib** memakai subdomain `*.scurebot.site`, bukan `*.vercel.app`.
 > Cookie login hanya terkirim kalau frontend dan API berada di domain induk yang sama.
+
+> **Bentuk link pendek.** Backend menerima dua bentuk sekaligus:
+> `s.scurebot.site/<slug>` (pendek) dan `s.scurebot.site/go/<slug>` (lama, tetap jalan).
+> Supaya aplikasi menampilkan bentuk pendek, set `VITE_SHORT_PREFIX=/` di Vercel.
+> Mau pakai domain lain yang lebih singkat? Beli domainnya, arahkan A record-nya ke IP VPS,
+> tambahkan hostname itu ke `VIRTUAL_HOST` dan `LETSENCRYPT_HOST` di `deploy/pm2-bridge.compose.yml`,
+> lalu set `VITE_SHORT_BASE` ke domain itu. Pakai domain jujur milik sendiri — jangan yang menyamar jadi situs lain.
 
 ---
 
@@ -107,6 +114,7 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
    ```
    VITE_API_URL=https://api-afilink.scurebot.site
    VITE_SHORT_BASE=https://s.scurebot.site
+   VITE_SHORT_PREFIX=/
    ```
 4. **Deploy**
 5. **Settings → Domains** → tambah `afilink.scurebot.site` (DNS CNAME dari langkah 2)
