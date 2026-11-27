@@ -26,6 +26,13 @@ app.use('/api', cors({
   origin: (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(','),
   credentials: true,
 }));
+
+// Statistik harus selalu terbaru: larang browser/proxy menyimpan respons API.
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/auth', auth);
 app.use('/api/links', links);

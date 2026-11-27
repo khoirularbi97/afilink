@@ -52,17 +52,24 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [recent, setRecent] = useState([]);
   const [err, setErr] = useState('');
+  const [tick, setTick] = useState(0);
+  const [updatedAt, setUpdatedAt] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => { api.get('/links').then(setLinks).catch(() => {}); }, []);
+  useEffect(() => { api.get('/links').then(setLinks).catch(() => {}); }, [tick]);
 
   useEffect(() => {
     const q = new URLSearchParams({ from: daysAgo(+preset - 1), to: todayWIB() });
     if (linkId) q.set('link_id', linkId);
-    setErr('');
+    setErr(''); setLoading(true);
     Promise.all([api.get('/stats/overview?' + q), api.get('/stats/recent')])
-      .then(([o, r]) => { setData(o); setRecent(r); })
-      .catch((e) => setErr(e.message));
-  }, [preset, linkId]);
+      .then(([o, r]) => { setData(o); setRecent(r); setUpdatedAt(new Date()); })
+      .catch((e) => setErr(e.message))
+      .finally(() => setLoading(false));
+  }, [preset, linkId, tick]);
+
+  const updatedText = updatedAt &&
+    updatedAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
 
   const update = (k, v) => {
     const p = new URLSearchParams(params);
@@ -77,9 +84,16 @@ export default function Dashboard() {
       <header className="page-head">
         <div>
           <h1>Statistik</h1>
-          <p className="muted">Klik dari bot dan crawler pratinjau link tidak dihitung di angka utama.</p>
+          <p className="muted">
+            Klik dari bot dan crawler pratinjau link tidak dihitung di angka utama.
+            {updatedText && <> · Diperbarui {updatedText}</>}
+          </p>
         </div>
         <div className="filters">
+          <button className="btn sm refresh" onClick={() => setTick((n) => n + 1)} disabled={loading} title="Muat ulang data">
+            <svg viewBox="0 0 24 24" className={loading ? 'spin' : ''} width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" /></svg>
+            {loading ? 'Memuat…' : 'Muat ulang'}
+          </button>
           <select value={linkId} onChange={(e) => update('link_id', e.target.value)}>
             <option value="">Semua link</option>
             {links.map((l) => <option key={l.id} value={l.id}>{l.title || l.slug}</option>)}

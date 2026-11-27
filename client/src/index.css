@@ -191,6 +191,7 @@ label { display: flex; flex-direction: column; gap: 5px; font-weight: 500; font-
 .center-pad { padding: 60px; display: grid; place-items: center; }
 .spinner { width: 26px; height: 26px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.btn.refresh svg.spin { animation: spin .7s linear infinite; }
 
 /* Responsive: sidebar jadi bottom bar di HP */
 @media (max-width: 960px) {
